@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimpleDevOps — The Layman's Guide to Git, Docker, EC2 & GitHub Actions</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand">
+        <span class="brand-dot"></span>
+        <span>SimpleDevOps</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#step-git">Git & GitHub</a></li>
+          <li><a href="#step-docker">Docker</a></li>
+          <li><a href="#step-ec2">AWS EC2</a></li>
+          <li><a href="#step-actions">GitHub Actions</a></li>
+          <li><a href="#glossary">Glossary</a></li>
+        </ul>
+      </nav>
+      <span class="nav-badge">DevOps Handbook</span>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="pill-badge">
+        <span>Layman Approach to Cloud Deployment</span>
+      </div>
+      <h1 class="hero-title">Ship Code from Your Laptop to a Live AWS Server Automatically</h1>
+      <p class="hero-subtitle">
+        A practical, beginner-friendly guide to hosting your project online. Learn how Git, Docker, AWS EC2, and GitHub Actions work together without overwhelming complexity.
+      </p>
+      <div class="hero-actions">
+        <a href="#architecture" class="btn btn-primary">Explore Architecture</a>
+        <a href="#step-actions" class="btn btn-secondary">View CI/CD Script</a>
+      </div>
+
+      <!-- Highlights Grid -->
+      <div class="highlights-grid">
+        <div class="highlight-card">
+          <div class="highlight-label">Simplicity First</div>
+          <div class="highlight-value">Build on EC2</div>
+          <div class="highlight-desc">No third-party registry or Docker Hub credentials required.</div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-label">Fully Automated</div>
+          <div class="highlight-value">Git Push Deploy</div>
+          <div class="highlight-desc">Pushing to your main branch updates your live website in seconds.</div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-label">Containerized</div>
+          <div class="highlight-value">Docker & Nginx</div>
+          <div class="highlight-desc">Runs identically on your laptop and in the Amazon cloud.</div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-label">Cost Efficiency</div>
+          <div class="highlight-value">AWS Free Tier</div>
+          <div class="highlight-desc">Runs entirely within the 750 free hours on t2.micro instances.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Diagram Section -->
+  <section id="architecture" class="diagram-section">
+    <div class="container">
+      <div class="diagram-card">
+        <div class="diagram-header">
+          <h2 class="diagram-title">System Architecture & Deployment Flow</h2>
+          <p class="diagram-caption">
+            Here is how code travels from your local editor to a visitor's browser when you push changes.
+          </p>
+        </div>
+
+        <div class="svg-diagram-wrapper">
+          <svg class="svg-diagram" viewBox="0 0 960 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background Grid Accent -->
+            <rect width="960" height="260" rx="16" fill="#f8fafc"/>
+
+            <!-- Node 1: Local Machine -->
+            <g transform="translate(40, 50)">
+              <rect width="160" height="150" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+              <rect x="16" y="16" width="32" height="32" rx="8" fill="#eff6ff"/>
+              <path d="M26 32h12M26 36h8M24 24h16a2 2 0 012 2v16a2 2 0 01-2 2H24a2 2 0 01-2-2V26a2 2 0 012-2z" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"/>
+              <text x="16" y="74" fill="#0f172a" font-family="-apple-system, sans-serif" font-size="14" font-weight="600">Developer Laptop</text>
+              <text x="16" y="94" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">Write HTML & CSS</text>
+              <text x="16" y="112" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">git commit & push</text>
+              <rect x="16" y="126" width="70" height="16" rx="4" fill="#f1f5f9"/>
+              <text x="22" y="138" fill="#475569" font-family="monospace" font-size="9.5">Local Git</text>
+            </g>
+
+            <!-- Arrow 1: Local to GitHub -->
+            <g transform="translate(200, 125)">
+              <line x1="10" y1="0" x2="65" y2="0" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+              <polygon points="65, -4 73, 0 65, 4" fill="#94a3b8"/>
+              <text x="16" y="-8" fill="#64748b" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="500">git push</text>
+            </g>
+
+            <!-- Node 2: GitHub Repository -->
+            <g transform="translate(280, 50)">
+              <rect width="160" height="150" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+              <rect x="16" y="16" width="32" height="32" rx="8" fill="#eff6ff"/>
+              <circle cx="32" cy="32" r="7" stroke="#0071e3" stroke-width="1.5"/>
+              <text x="16" y="74" fill="#0f172a" font-family="-apple-system, sans-serif" font-size="14" font-weight="600">GitHub Repository</text>
+              <text x="16" y="94" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">Source Control</text>
+              <text x="16" y="112" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">Encrypted Secrets</text>
+              <rect x="16" y="126" width="92" height="16" rx="4" fill="#f1f5f9"/>
+              <text x="22" y="138" fill="#475569" font-family="monospace" font-size="9.5">main branch</text>
+            </g>
+
+            <!-- Arrow 2: GitHub to Actions -->
+            <g transform="translate(440, 125)">
+              <line x1="10" y1="0" x2="55" y2="0" stroke="#0071e3" stroke-width="2"/>
+              <polygon points="55, -4 63, 0 55, 4" fill="#0071e3"/>
+              <text x="12" y="-8" fill="#0071e3" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600">Triggers</text>
+            </g>
+
+            <!-- Node 3: GitHub Actions -->
+            <g transform="translate(510, 50)">
+              <rect width="170" height="150" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+              <rect x="16" y="16" width="32" height="32" rx="8" fill="#eff6ff"/>
+              <path d="M26 26l12 12M38 26l-12 12" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"/>
+              <text x="16" y="74" fill="#0f172a" font-family="-apple-system, sans-serif" font-size="14" font-weight="600">GitHub Actions</text>
+              <text x="16" y="94" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">SSH Runner Bot</text>
+              <text x="16" y="112" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">Runs deploy.yml</text>
+              <rect x="16" y="126" width="100" height="16" rx="4" fill="#f1f5f9"/>
+              <text x="22" y="138" fill="#475569" font-family="monospace" font-size="9.5">appleboy/ssh</text>
+            </g>
+
+            <!-- Arrow 3: Actions to EC2 -->
+            <g transform="translate(680, 125)">
+              <line x1="10" y1="0" x2="60" y2="0" stroke="#10b981" stroke-width="2"/>
+              <polygon points="60, -4 68, 0 60, 4" fill="#10b981"/>
+              <text x="14" y="-8" fill="#10b981" font-family="-apple-system, sans-serif" font-size="10.5" font-weight="600">SSH & Build</text>
+            </g>
+
+            <!-- Node 4: AWS EC2 Server -->
+            <g transform="translate(755, 35)">
+              <rect width="170" height="180" rx="12" fill="#ffffff" stroke="#0071e3" stroke-width="2"/>
+              <rect x="16" y="16" width="32" height="32" rx="8" fill="#f0fdf4"/>
+              <rect x="22" y="24" width="20" height="16" rx="3" stroke="#10b981" stroke-width="1.5"/>
+              <text x="16" y="72" fill="#0f172a" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">AWS EC2 (Ubuntu)</text>
+              <text x="16" y="92" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">1. git pull</text>
+              <text x="16" y="108" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">2. docker build</text>
+              <text x="16" y="124" fill="#64748b" font-family="-apple-system, sans-serif" font-size="11.5">3. docker run :80</text>
+              <rect x="16" y="138" width="138" height="22" rx="6" fill="#0071e3"/>
+              <text x="24" y="153" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="11" font-weight="600">Live Website on Port 80</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 1: Git and GitHub -->
+  <section id="step-git" class="section">
+    <div class="container">
+      <span class="section-tag">Phase 01</span>
+      <h2 class="section-heading">Version Control with Git & GitHub</h2>
+      <p class="section-lead">
+        Git tracks every modification you make. GitHub is a secure cloud drive for your Git history where our deployment robot listens for updates.
+      </p>
+
+      <div class="step-grid">
+        <div class="step-content">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <h3 class="step-title">The Layman Analogy</h3>
+            <p class="step-text">
+              Think of Git as saving snapshots in a video game before entering a new level. If anything breaks, you can travel back in time to an earlier working snapshot with a single command.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <h3 class="step-title">Why GitHub Matters Here</h3>
+            <p class="step-text">
+              GitHub does more than store code. It provides an automated event listener. Every time you push code to GitHub, it can notify AWS to pull the latest version and refresh your website.
+            </p>
+          </div>
+
+          <div class="callout">
+            <strong>Key Rule:</strong> Keep your project clean. Never commit large binary caches or private keys to Git.
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-title">Terminal &mdash; Local Machine Setup</span>
+            <button class="btn-copy" data-target="code-git">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <div id="code-git" class="code-block">
+<span class="token-comment"># 1. Initialize Git in your project folder</span>
+<span class="token-cmd">git</span> init
+
+<span class="token-comment"># 2. Add all project files to staging</span>
+<span class="token-cmd">git</span> add .
+
+<span class="token-comment"># 3. Create your first snapshot</span>
+<span class="token-cmd">git</span> commit -m <span class="token-str">"Initial release of SimpleDevOps project"</span>
+
+<span class="token-comment"># 4. Link your local project to your GitHub repository</span>
+<span class="token-cmd">git</span> branch -M main
+<span class="token-cmd">git</span> remote add origin <span class="token-arg">https://github.com/YOUR_USERNAME/SimpleDevOps.git</span>
+
+<span class="token-comment"># 5. Push code to GitHub</span>
+<span class="token-cmd">git</span> push -u origin main
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: Docker -->
+  <section id="step-docker" class="section">
+    <div class="container">
+      <span class="section-tag">Phase 02</span>
+      <h2 class="section-heading">Containerization with Docker</h2>
+      <p class="section-lead">
+        Docker packages your web application and its server into a standalone container, eliminating the classic problem of "it works on my machine but not on the server."
+      </p>
+
+      <div class="step-grid">
+        <div class="step-content">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <h3 class="step-title">The Layman Analogy</h3>
+            <p class="step-text">
+              Imagine packing a lunchbox that includes its own spoon, napkin, plate, and thermos. Wherever you open it &mdash; on a train, in a park, or in an office &mdash; the meal experience is 100% identical. That is a Docker container.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <h3 class="step-title">Nginx Alpine: The Lightweight Engine</h3>
+            <p class="step-text">
+              We use <code>nginx:alpine</code>. It is a battle-tested web server packaged inside Alpine Linux that consumes only around 20MB of disk space and serves static HTML files at lightning speed.
+            </p>
+          </div>
+
+          <div class="callout">
+            <strong>Port 80 Explained:</strong> Port 80 is the standard port for regular HTTP web traffic. When visitors type your server's IP address, their browser automatically connects to Port 80.
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-title">Dockerfile &mdash; In Project Root</span>
+            <button class="btn-copy" data-target="code-docker">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <div id="code-docker" class="code-block">
+<span class="token-comment"># Step 1: Use official lightweight Nginx image</span>
+<span class="token-kw">FROM</span> nginx:alpine
+
+<span class="token-comment"># Step 2: Copy all project files into Nginx default web directory</span>
+<span class="token-kw">COPY</span> . /usr/share/nginx/html
+
+<span class="token-comment"># Step 3: Tell Docker the container receives traffic on port 80</span>
+<span class="token-kw">EXPOSE</span> 80
+
+<span class="token-comment"># Step 4: Start Nginx web server in the foreground</span>
+<span class="token-kw">CMD</span> [<span class="token-str">"nginx"</span>, <span class="token-str">"-g"</span>, <span class="token-str">"daemon off;"</span>]
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 3: AWS EC2 -->
+  <section id="step-ec2" class="section">
+    <div class="container">
+      <span class="section-tag">Phase 03</span>
+      <h2 class="section-heading">Cloud Virtual Machine with AWS EC2</h2>
+      <p class="section-lead">
+        Amazon Elastic Compute Cloud (EC2) provides an on-demand virtual computer in the cloud that stays powered on 24 hours a day, 7 days a week.
+      </p>
+
+      <div class="step-grid">
+        <div class="step-content">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <h3 class="step-title">Create Free Tier Instance</h3>
+            <p class="step-text">
+              Log in to the AWS Console, navigate to <strong>EC2 &gt; Launch Instance</strong>. Select <strong>Ubuntu 24.04 LTS</strong> and choose the <strong>t2.micro</strong> (or t3.micro) size, which is eligible for the AWS Free Tier.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <h3 class="step-title">Configure Security Group (Firewall)</h3>
+            <p class="step-text">
+              The Security Group acts as the virtual firewall for your server. You must allow two essential inbound rules:
+            </p>
+            <ul style="margin: 8px 0 0 18px; font-size: 13.5px; color: var(--text-secondary);">
+              <li><strong>Port 22 (SSH):</strong> For GitHub Actions and you to securely connect.</li>
+              <li><strong>Port 80 (HTTP):</strong> Open to <code>0.0.0.0/0</code> so any web browser can view your site.</li>
+            </ul>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">3</span>
+            <h3 class="step-title">Key Pair (.pem file)</h3>
+            <p class="step-text">
+              Create a new key pair named <code>simple-devops-key.pem</code> and download it. Store it safely &mdash; Amazon will never show you this private key again.
+            </p>
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-title">Terminal &mdash; Install Docker on EC2 (Run Once)</span>
+            <button class="btn-copy" data-target="code-ec2">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <div id="code-ec2" class="code-block">
+<span class="token-comment"># 1. SSH into your EC2 server from your laptop</span>
+<span class="token-cmd">chmod</span> 400 simple-devops-key.pem
+<span class="token-cmd">ssh</span> -i simple-devops-key.pem ubuntu@<span class="token-arg">YOUR_EC2_PUBLIC_IP</span>
+
+<span class="token-comment"># 2. Update server packages and install Docker & Git</span>
+<span class="token-cmd">sudo</span> apt update -y
+<span class="token-cmd">sudo</span> apt install -y docker.io git
+
+<span class="token-comment"># 3. Allow ubuntu user to run Docker without sudo</span>
+<span class="token-cmd">sudo</span> usermod -aG docker ubuntu
+<span class="token-cmd">newgrp</span> docker
+
+<span class="token-comment"># 4. Verify Docker is running</span>
+<span class="token-cmd">docker</span> --version
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 4: GitHub Actions & Layman Build on EC2 -->
+  <section id="step-actions" class="section">
+    <div class="container">
+      <span class="section-tag">Phase 04</span>
+      <h2 class="section-heading">Automated Deployment with GitHub Actions</h2>
+      <p class="section-lead">
+        GitHub Actions is your automated robot. Whenever you push code to GitHub, this script securely logs into your EC2 machine, pulls the changes, rebuilds the Docker container, and restarts it.
+      </p>
+
+      <div class="step-grid">
+        <div class="step-content">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <h3 class="step-title">Why Build on EC2? (The Simplest Approach)</h3>
+            <p class="step-text">
+              Industry setups often push images to Docker Hub or AWS ECR first. But for beginners and small projects, building directly on EC2 is significantly simpler: zero account registration, zero subscription fees, zero token expiration headaches.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <h3 class="step-title">Configure GitHub Repository Secrets</h3>
+            <p class="step-text">
+              In your GitHub repository, navigate to <strong>Settings &gt; Secrets and variables &gt; Actions</strong> and add these three repository secrets:
+            </p>
+            <ul style="margin: 8px 0 0 18px; font-size: 13.5px; color: var(--text-secondary);">
+              <li><code>EC2_HOST</code>: The Public IPv4 address of your EC2 server.</li>
+              <li><code>EC2_USER</code>: <code>ubuntu</code></li>
+              <li><code>EC2_SSH_KEY</code>: The full text inside your <code>simple-devops-key.pem</code> file.</li>
+            </ul>
+          </div>
+
+          <div class="callout">
+            <strong>Zero Downtime Principle:</strong> The workflow stops the old container and immediately spins up the new container with port mapping <code>80:80</code>.
+          </div>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-title">.github/workflows/deploy.yml</span>
+            <button class="btn-copy" data-target="code-workflow">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <div id="code-workflow" class="code-block">
+<span class="token-kw">name</span>: Deploy to AWS EC2
+
+<span class="token-kw">on</span>:
+  <span class="token-kw">push</span>:
+    <span class="token-kw">branches</span>:
+      - main
+
+<span class="token-kw">jobs</span>:
+  <span class="token-kw">deploy</span>:
+    <span class="token-kw">name</span>: Build & Run on EC2
+    <span class="token-kw">runs-on</span>: ubuntu-latest
+
+    <span class="token-kw">steps</span>:
+      - <span class="token-kw">name</span>: Checkout Repository
+        <span class="token-kw">uses</span>: actions/checkout@v4
+
+      - <span class="token-kw">name</span>: Connect & Deploy on EC2 via SSH
+        <span class="token-kw">uses</span>: appleboy/ssh-action@v1.0.3
+        <span class="token-kw">with</span>:
+          <span class="token-kw">host</span>: ${{ secrets.EC2_HOST }}
+          <span class="token-kw">username</span>: ${{ secrets.EC2_USER }}
+          <span class="token-kw">key</span>: ${{ secrets.EC2_SSH_KEY }}
+          <span class="token-kw">script</span>: |
+            # 1. Clone repository if not present on server
+            if [ ! -d "$HOME/SimpleDevOps" ]; then
+              git clone https://github.com/${{ github.repository }}.git $HOME/SimpleDevOps
+            fi
+            
+            cd $HOME/SimpleDevOps
+            
+            # 2. Pull latest code from GitHub main branch
+            git reset --hard
+            git pull origin main
+            
+            # 3. Build Docker image directly on EC2
+            docker build -t simple-devops-app .
+            
+            # 4. Stop and remove existing container
+            docker stop simple-devops-app || true
+            docker rm simple-devops-app || true
+            
+            # 5. Launch newly built container on port 80
+            docker run -d --name simple-devops-app -p 80:80 --restart unless-stopped simple-devops-app
+            
+            # 6. Verify container status
+            docker ps --filter "name=simple-devops-app"
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Layman DevOps Glossary -->
+  <section id="glossary" class="section">
+    <div class="container">
+      <span class="section-tag">Reference</span>
+      <h2 class="section-heading">Layman DevOps Glossary</h2>
+      <p class="section-lead">
+        Plain English explanations of common industry jargon so you never feel lost during discussions or interviews.
+      </p>
+
+      <div class="glossary-grid">
+        <div class="glossary-card">
+          <div class="glossary-term">
+            <span>Repository</span>
+            <span class="glossary-badge">Git</span>
+          </div>
+          <div class="glossary-def">
+            A project folder tracked by Git that remembers the full timeline of every change, addition, and deletion.
+          </div>
+        </div>
+
+        <div class="glossary-card">
+          <div class="glossary-term">
+            <span>Docker Image</span>
+            <span class="glossary-badge">Docker</span>
+          </div>
+          <div class="glossary-def">
+            The frozen blueprint or recipe. It specifies the operating system, web server, and code files to package.
+          </div>
+        </div>
+
+        <div class="glossary-card">
+          <div class="glossary-term">
+            <span>Docker Container</span>
+            <span class="glossary-badge">Docker</span>
+          </div>
+          <div class="glossary-def">
+            A running instance of your Docker image. If the image is the recipe, the container is the cooked meal.
+          </div>
+        </div>
+
+        <div class="glossary-card">
+          <div class="glossary-term">
+            <span>EC2 Instance</span>
+            <span class="glossary-badge">AWS</span>
+          </div>
+          <div class="glossary-def">
+            A virtual machine running in an Amazon data center with its own dedicated IP address and internet connection.
+          </div>
+        </div>
+
+        <div class="glossary-card">
+          <div class="glossary-term">
+            <span>Security Group</span>
+            <span class="glossary-badge">AWS</span>
+          </div>
+          <div class="glossary-def">
+            A virtual firewall controlling which ports (such as SSH Port 22 or Web Port 80) can communicate with your server.
+          </div>
+        </div>
+
+        <div class="glossary-card">
+          <div class="glossary-term">
+            <span>CI / CD</span>
+            <span class="glossary-badge">Pipeline</span>
+          </div>
+          <div class="glossary-def">
+            Continuous Integration and Continuous Deployment. Code is tested and shipped automatically the moment you push to Git.
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Checklist -->
+      <div class="checklist" style="margin-top: 40px;">
+        <div class="checklist-item">
+          <div class="checklist-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="checklist-text">
+            <strong>Check 1: Security Group Open on Port 80</strong>
+            Ensure your EC2 Security Group contains an Inbound Rule for Type: HTTP, Port Range: 80, Source: 0.0.0.0/0.
+          </div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="checklist-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="checklist-text">
+            <strong>Check 2: GitHub Repository Secrets Verified</strong>
+            Double-check that <code>EC2_HOST</code> contains the raw IP (without http://), <code>EC2_USER</code> is <code>ubuntu</code>, and <code>EC2_SSH_KEY</code> includes the complete text from <code>-----BEGIN RSA PRIVATE KEY-----</code> to <code>-----END RSA PRIVATE KEY-----</code>.
+          </div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="checklist-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="checklist-text">
+            <strong>Check 3: Visit in Your Browser</strong>
+            Once your GitHub Action finishes with a green checkmark, open your browser and navigate to <code>http://YOUR_EC2_PUBLIC_IP</code> to see this website live.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-text">
+        SimpleDevOps &mdash; Clean, Minimalist Web Architecture & Cloud Deployment Handbook
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
